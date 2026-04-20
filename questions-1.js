@@ -1,4 +1,4 @@
-const questions-1 = [
+const questions = [
   {
     id: "Q1-001",
     type: "mc",
