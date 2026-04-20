@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Water Treatment Quiz</title>
+  <style>
+    body { font-family: Arial; max-width: 800px; margin: auto; }
+    .q { padding: 12px; border-bottom: 1px solid #ddd; }
+    button { margin: 4px 0; display: block; width: 100%; padding: 6px; }
+    .correct { background: #c8f7c5; }
+    .wrong { background: #f7c5c5; }
+    .report { font-size: 12px; margin-top: 6px; display: inline-block; }
+  </style>
+</head>
+<body>
+
+<h2>Water Treatment Practice</h2>
+
+<div id="quiz"></div>
+
+<script src="questions.js"></script>
+<script>
+function githubIssueLink(q) {
+  const title = encodeURIComponent(`Issue with question ${q.id}`);
+  const body = encodeURIComponent(
+`Question ID: ${q.id}
+Type: ${q.type}
+Tags: ${(q.tags || []).join(", ")}
+
+Problem:
+[describe issue]
+
+Suggested fix:
+`
+  );
+
+  return `https://github.com/bwards/waterstudy/issues/new?title=${title}&body=${body}`;
+}
+
+function render() {
+  const container = document.getElementById("quiz");
+
+  questions.forEach(q => {
+    const div = document.createElement("div");
+    div.className = "q";
+
+    const title = document.createElement("h4");
+    title.innerText = `${q.question} [${q.id}]`;
+    div.appendChild(title);
+
+    const report = document.createElement("a");
+    report.href = githubIssueLink(q);
+    report.target = "_blank";
+    report.innerText = "Report issue";
+    report.className = "report";
+    div.appendChild(report);
+
+    if (q.type === "tf") {
+      [true, false].forEach(val => {
+        const btn = document.createElement("button");
+        btn.innerText = val.toString();
+
+        btn.onclick = () => {
+          if (div.classList.contains("answered")) return;
+          div.classList.add("answered");
+
+          if (val === q.answer) {
+            btn.classList.add("correct");
+          } else {
+            btn.classList.add("wrong");
+          }
+        };
+
+        div.appendChild(btn);
+      });
+    }
+
+    if (q.type === "mc") {
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.innerText = opt;
+
+        btn.onclick = () => {
+          if (div.classList.contains("answered")) return;
+          div.classList.add("answered");
+
+          const buttons = div.querySelectorAll("button");
+          buttons[q.answer].classList.add("correct");
+
+          if (i !== q.answer) {
+            btn.classList.add("wrong");
+          } else {
+            btn.classList.add("correct");
+          }
+        };
+
+        div.appendChild(btn);
+      });
+    }
+
+    container.appendChild(div);
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
