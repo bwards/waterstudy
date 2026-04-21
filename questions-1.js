@@ -7,10 +7,10 @@ const questions = [
       "Bones become stronger",
       "Growth will be stunted",
       "Fewer dental cavities",
-      "Perform better in school",
+      "Perform better in school"
     ],
     answer: 2,
-    tag: ["fluoride"]
+    tags: ["fluoride"]
   },
   {
     id: "Q1-002",
