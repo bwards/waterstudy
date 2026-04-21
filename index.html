@@ -8,7 +8,7 @@
     button { margin: 4px 0; display: block; width: 100%; padding: 6px; }
     .correct { background: #c8f7c5; }
     .wrong { background: #f7c5c5; }
-    .report { font-size: 12px; margin-top: 6px; display: inline-block; }
+    .report { font-size: 12px; display: inline-block; margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -18,6 +18,7 @@
 <div id="quiz"></div>
 
 <script src="questions-1.js"></script>
+
 <script>
 function githubIssueLink(q) {
   const title = encodeURIComponent(`Issue with question ${q.id}`);
@@ -38,21 +39,27 @@ Suggested fix:
 
 function render() {
   const container = document.getElementById("quiz");
+  container.innerHTML = "";
 
   questions.forEach(q => {
     const div = document.createElement("div");
     div.className = "q";
 
+    // title
     const title = document.createElement("h4");
     title.innerText = `${q.question} [${q.id}]`;
     div.appendChild(title);
 
+    // report link
     const report = document.createElement("a");
     report.href = githubIssueLink(q);
     report.target = "_blank";
     report.innerText = "Report issue";
     report.className = "report";
     div.appendChild(report);
+
+    const wrap = document.createElement("div");
+    div.appendChild(wrap);
 
     if (q.type === "tf") {
       [true, false].forEach(val => {
@@ -63,14 +70,17 @@ function render() {
           if (div.classList.contains("answered")) return;
           div.classList.add("answered");
 
+          const buttons = wrap.querySelectorAll("button");
+
           if (val === q.answer) {
             btn.classList.add("correct");
           } else {
             btn.classList.add("wrong");
+            buttons[q.answer ? 0 : 1].classList.add("correct");
           }
         };
 
-        div.appendChild(btn);
+        wrap.appendChild(btn);
       });
     }
 
@@ -83,17 +93,17 @@ function render() {
           if (div.classList.contains("answered")) return;
           div.classList.add("answered");
 
-          const buttons = div.querySelectorAll("button");
-          buttons[q.answer].classList.add("correct");
+          const buttons = wrap.querySelectorAll("button");
 
-          if (i !== q.answer) {
-            btn.classList.add("wrong");
-          } else {
+          if (i === q.answer) {
             btn.classList.add("correct");
+          } else {
+            btn.classList.add("wrong");
+            buttons[q.answer].classList.add("correct");
           }
         };
 
-        div.appendChild(btn);
+        wrap.appendChild(btn);
       });
     }
 
