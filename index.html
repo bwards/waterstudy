@@ -170,6 +170,28 @@
       margin-left: auto;
     }
 
+    .report-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      padding: 3px 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .report-btn:hover {
+      border-color: var(--incorrect);
+      color: var(--incorrect);
+    }
+
     .q-text {
       font-size: clamp(1rem, 2.5vw, 1.15rem);
       font-weight: 500;
@@ -463,11 +485,34 @@ function renderQuestion(q) {
   if (q.type === "select_all")   body = renderSelectAll(q);
   if (q.type === "flashcard")    body = renderFlashcard(q);
 
+  const optionsText = q.options.length
+    ? q.options.map((o, i) => `${String.fromCharCode(65+i)}. ${o}`).join("\n")
+    : "N/A";
+
+  const answerText = Array.isArray(q.answer) ? q.answer.join("; ") : q.answer;
+
+  const issueTitle = encodeURIComponent(`[Question Report] ${q.id}`);
+  const issueBody = encodeURIComponent(
+`**Question ID:** ${q.id}
+**Type:** ${typeLabel(q.type)}
+**Question:** ${q.question}
+**Answer:** ${answerText}
+**Options:**
+${optionsText}
+**Tags:** ${q.tags.join(", ") || "none"}
+
+---
+**Describe the issue:**
+(e.g. answer is wrong, typo, missing period, unclear wording)
+`);
+  const reportUrl = `https://github.com/bwards/waterstudy/issues/new?title=${issueTitle}&body=${issueBody}`;
+
   return `
     <div class="q-card" id="card-${q.id}" data-type="${q.type}">
       <div class="q-header">
         <span class="q-type-badge badge-${q.type}">${typeLabel(q.type)}</span>
         <span class="q-id">${q.id}</span>
+        <a class="report-btn" href="${reportUrl}" target="_blank" rel="noopener">⚑ Report</a>
       </div>
       <p class="q-text">${q.question}</p>
       ${tags}
