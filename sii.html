@@ -569,7 +569,7 @@
 
 <div class="question-list" id="questionList"></div>
 
-<script src="sii-dataset.js"></script>
+<script src="questions2.js"></script>
 <script>
 // ─── Storage ─────────────────────────────────────────────────────────────────
 const DATASET_SOURCE = questions[0]?.source || "unknown";
@@ -641,8 +641,8 @@ function renderTrueFalse(q) {
 }
 
 function renderMultiChoice(q) {
-  const btns = q.options.map(opt => `
-    <button class="option-btn" data-qid="${q.id}" data-value="${opt}">${opt}</button>
+  const btns = q.options.map((opt, idx) => `
+    <button class="option-btn" data-qid="${q.id}" data-index="${idx + 1}">${opt}</button>
   `).join("");
   return `
     <div class="options">${btns}</div>
@@ -657,11 +657,11 @@ function renderMultiChoice(q) {
 }
 
 function renderSelectAll(q) {
-  const btns = q.options.map(opt => `
-    <button class="option-btn sa-option" data-qid="${q.id}" data-value="${opt}">${opt}</button>
+  const btns = q.options.map((opt, idx) => `
+    <button class="option-btn sa-option" data-qid="${q.id}" data-index="${idx + 1}">${opt}</button>
   `).join("");
   return `
-    <p class="select-all-hint">Select all that apply</p>
+    <p class="select-all-hint">Select all that apply — ${q.answer.length} correct answer${q.answer.length === 1 ? '' : 's'}</p>
     <div class="options">${btns}</div>
     <button class="check-btn" id="check-${q.id}" disabled>Check Answer</button>
     <div class="feedback" id="fb-${q.id}">
@@ -791,15 +791,24 @@ function restoreCard(q) {
     if (!s.answered) return;
     const btns = document.querySelectorAll(`[data-qid="${q.id}"]`);
     btns.forEach(b => {
-      const val = b.dataset.value.trim().toLowerCase();
-      if (val === s.selected.trim().toLowerCase()) {
-        b.classList.add(s.correct ? "selected-correct" : "selected-incorrect");
-      } else if (!s.correct && val === q.answer.trim().toLowerCase()) {
-        b.classList.add("reveal-correct");
+      if (q.type === "true_false") {
+        const val = b.dataset.value.trim().toLowerCase();
+        if (val === s.selected.trim().toLowerCase()) {
+          b.classList.add(s.correct ? "selected-correct" : "selected-incorrect");
+        }
+      } else {
+        // multi_choice
+        const idx = parseInt(b.dataset.index, 10);
+        if (idx === s.selected) {
+          b.classList.add(s.correct ? "selected-correct" : "selected-incorrect");
+        } else if (!s.correct && idx === q.answer) {
+          b.classList.add("reveal-correct");
+        }
       }
       b.disabled = true;
     });
-    showFeedback(q.id, s.correct, q.answer, q.context);
+    const correctAnswerText = q.type === "multi_choice" ? q.options[q.answer - 1] : q.answer;
+    showFeedback(q.id, s.correct, correctAnswerText, q.context);
     document.getElementById(`card-${q.id}`)
       .classList.add(s.correct ? "answered-correct" : "answered-incorrect");
   }
@@ -807,11 +816,10 @@ function restoreCard(q) {
   if (q.type === "select_all") {
     if (!s.answered) return;
     const saOptions = document.querySelectorAll(`#card-${q.id} .sa-option`);
-    const correctLower = q.answer.map(a => a.trim().toLowerCase());
     saOptions.forEach(b => {
-      const val = b.dataset.value.trim().toLowerCase();
-      const wasSelected = s.selected.map(x => x.trim().toLowerCase()).includes(val);
-      const isCorrectOpt = correctLower.includes(val);
+      const idx = parseInt(b.dataset.index, 10);
+      const wasSelected = s.selected.includes(idx);
+      const isCorrectOpt = q.answer.includes(idx);
       if (wasSelected && isCorrectOpt)  b.classList.add("selected-correct");
       else if (wasSelected && !isCorrectOpt) b.classList.add("selected-incorrect");
       else if (!wasSelected && isCorrectOpt) b.classList.add("reveal-correct");
@@ -819,7 +827,8 @@ function restoreCard(q) {
     });
     const checkBtn = document.getElementById(`check-${q.id}`);
     if (checkBtn) checkBtn.disabled = true;
-    showFeedback(q.id, s.correct, q.answer.join(", "), q.context);
+    const correctAnswerTexts = q.answer.map(idx => q.options[idx - 1]).join(", ");
+    showFeedback(q.id, s.correct, correctAnswerTexts, q.context);
     document.getElementById(`card-${q.id}`)
       .classList.add(s.correct ? "answered-correct" : "answered-incorrect");
   }
@@ -843,21 +852,30 @@ function attachEvents(filtered) {
     if (session[q.id]?.answered) return; // already answered, skip
     document.querySelectorAll(`[data-qid="${q.id}"]`).forEach(btn => {
       btn.addEventListener("click", () => {
-        const selected = btn.dataset.value;
-        const correct = selected.trim().toLowerCase() === q.answer.trim().toLowerCase();
+        let selected, correct;
+        
+        if (q.type === "true_false") {
+          selected = btn.dataset.value;
+          correct = selected.trim().toLowerCase() === q.answer.trim().toLowerCase();
+        } else {
+          // multi_choice: compare index
+          selected = parseInt(btn.dataset.index, 10);
+          correct = selected === q.answer;
+        }
 
         btn.classList.add(correct ? "selected-correct" : "selected-incorrect");
 
-        if (!correct) {
+        if (!correct && q.type === "multi_choice") {
           document.querySelectorAll(`[data-qid="${q.id}"]`).forEach(b => {
-            if (b.dataset.value.trim().toLowerCase() === q.answer.trim().toLowerCase()) {
+            if (parseInt(b.dataset.index, 10) === q.answer) {
               b.classList.add("reveal-correct");
             }
           });
         }
 
         disableOptions(q.id);
-        showFeedback(q.id, correct, q.answer, q.context);
+        const correctAnswerText = q.type === "multi_choice" ? q.options[q.answer - 1] : q.answer;
+        showFeedback(q.id, correct, correctAnswerText, q.context);
 
         const card = document.getElementById(`card-${q.id}`);
         card.classList.add(correct ? "answered-correct" : "answered-incorrect");
@@ -889,18 +907,18 @@ function attachEvents(filtered) {
     checkBtn.addEventListener("click", () => {
       const selected = [...saOptions]
         .filter(b => b.classList.contains("selected-correct"))
-        .map(b => b.dataset.value.trim().toLowerCase());
+        .map(b => parseInt(b.dataset.index, 10));
 
-      const correct = q.answer.map(a => a.trim().toLowerCase());
+      const correct = q.answer; // already an array of integers
       const isCorrect =
         selected.length === correct.length &&
         correct.every(a => selected.includes(a));
 
       saOptions.forEach(btn => {
         btn.classList.remove("selected-correct");
-        const val = btn.dataset.value.trim().toLowerCase();
-        const wasSelected = selected.includes(val);
-        const isCorrectOption = correct.includes(val);
+        const idx = parseInt(btn.dataset.index, 10);
+        const wasSelected = selected.includes(idx);
+        const isCorrectOption = correct.includes(idx);
 
         if (wasSelected && isCorrectOption) btn.classList.add("selected-correct");
         else if (wasSelected && !isCorrectOption) btn.classList.add("selected-incorrect");
@@ -910,7 +928,8 @@ function attachEvents(filtered) {
       });
 
       checkBtn.disabled = true;
-      showFeedback(q.id, isCorrect, q.answer.join(", "), q.context);
+      const correctAnswerTexts = q.answer.map(idx => q.options[idx - 1]).join(", ");
+      showFeedback(q.id, isCorrect, correctAnswerTexts, q.context);
 
       const card = document.getElementById(`card-${q.id}`);
       card.classList.add(isCorrect ? "answered-correct" : "answered-incorrect");
@@ -919,11 +938,7 @@ function attachEvents(filtered) {
       answeredCount++;
       updateScore();
 
-      // Save with original-case selected values for display fidelity
-      const selectedOriginal = [...saOptions]
-        .filter(b => selected.includes(b.dataset.value.trim().toLowerCase()))
-        .map(b => b.dataset.value);
-      session[q.id] = { answered: true, selected: selectedOriginal, correct: isCorrect };
+      session[q.id] = { answered: true, selected, correct: isCorrect };
       saveSession();
     });
   });
