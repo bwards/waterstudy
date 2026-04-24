@@ -20,6 +20,8 @@
       --incorrect-bg: #3a1a20;
       --flash:      #f0a045;
       --flash-bg:   #3a2a10;
+      --selected:   #2a4a6a;
+      --selected-border: #3d6b9a;
       --radius:     14px;
       --radius-sm:  8px;
     }
@@ -160,7 +162,7 @@
     }
 
     .badge-true_false   { color: var(--accent);    border-color: var(--accent);    background: rgba(79,163,209,0.1); }
-    .badge-multi_choice { color: #a78bfa;           border-color: #a78bfa;          background: rgba(167,139,250,0.1); }
+    .badge-best_answer { color: #a78bfa;           border-color: #a78bfa;          background: rgba(167,139,250,0.1); }
     .badge-select_all   { color: var(--correct);   border-color: var(--correct);   background: rgba(61,189,130,0.1); }
     .badge-flashcard    { color: var(--flash);      border-color: var(--flash);     background: rgba(240,160,69,0.1); }
 
@@ -241,6 +243,11 @@
     .option-btn:hover:not(:disabled) {
       border-color: var(--accent);
       background: rgba(79,163,209,0.08);
+    }
+
+    .option-btn.selected {
+      background: var(--selected);
+      border-color: var(--selected-border);
     }
 
     .option-btn.selected-correct {
@@ -562,7 +569,7 @@
 <div class="filters" id="filters">
   <button class="filter-btn active" data-filter="all">All</button>
   <button class="filter-btn" data-filter="true_false">True / False</button>
-  <button class="filter-btn" data-filter="multi_choice">Multiple Choice</button>
+  <button class="filter-btn" data-filter="best_answer">Best Answer</button>
   <button class="filter-btn" data-filter="select_all">Select All</button>
   <button class="filter-btn" data-filter="flashcard">Flashcard</button>
 </div>
@@ -601,7 +608,7 @@ let incorrectCount = 0;
 let answeredCount = 0;
 let currentFilter = "all";
 
-const scoredTypes = ["true_false", "multi_choice", "select_all"];
+const scoredTypes = ["true_false", "best_answer", "select_all"];
 const scorableQuestions = questions.filter(q => scoredTypes.includes(q.type));
 
 // Rehydrate counts from saved session on load
@@ -618,7 +625,7 @@ questions.forEach(q => {
 function typeLabel(type) {
   return {
     true_false:   "True / False",
-    multi_choice: "Multiple Choice",
+    best_answer: "Best Answer",
     select_all:   "Select All",
     flashcard:    "Flashcard"
   }[type] || type;
@@ -694,7 +701,7 @@ function renderQuestion(q) {
 
   let body = "";
   if (q.type === "true_false")   body = renderTrueFalse(q);
-  if (q.type === "multi_choice") body = renderMultiChoice(q);
+  if (q.type === "best_answer") body = renderMultiChoice(q);
   if (q.type === "select_all")   body = renderSelectAll(q);
   if (q.type === "flashcard")    body = renderFlashcard(q);
 
@@ -787,7 +794,7 @@ function restoreCard(q) {
   const s = session[q.id];
   if (!s) return;
 
-  if (q.type === "true_false" || q.type === "multi_choice") {
+  if (q.type === "true_false" || q.type === "best_answer") {
     if (!s.answered) return;
     const btns = document.querySelectorAll(`[data-qid="${q.id}"]`);
     btns.forEach(b => {
@@ -797,7 +804,7 @@ function restoreCard(q) {
           b.classList.add(s.correct ? "selected-correct" : "selected-incorrect");
         }
       } else {
-        // multi_choice
+        // best_answer
         const idx = parseInt(b.dataset.index, 10);
         if (idx === s.selected) {
           b.classList.add(s.correct ? "selected-correct" : "selected-incorrect");
@@ -807,7 +814,7 @@ function restoreCard(q) {
       }
       b.disabled = true;
     });
-    const correctAnswerText = q.type === "multi_choice" ? q.options[q.answer - 1] : q.answer;
+    const correctAnswerText = q.type === "best_answer" ? q.options[q.answer - 1] : q.answer;
     showFeedback(q.id, s.correct, correctAnswerText, q.context);
     document.getElementById(`card-${q.id}`)
       .classList.add(s.correct ? "answered-correct" : "answered-incorrect");
@@ -848,7 +855,7 @@ function attachEvents(filtered) {
   filtered.forEach(q => restoreCard(q));
 
   // True/False & Multi Choice — immediate on click
-  filtered.filter(q => q.type === "true_false" || q.type === "multi_choice").forEach(q => {
+  filtered.filter(q => q.type === "true_false" || q.type === "best_answer").forEach(q => {
     if (session[q.id]?.answered) return; // already answered, skip
     document.querySelectorAll(`[data-qid="${q.id}"]`).forEach(btn => {
       btn.addEventListener("click", () => {
@@ -858,14 +865,14 @@ function attachEvents(filtered) {
           selected = btn.dataset.value;
           correct = selected.trim().toLowerCase() === q.answer.trim().toLowerCase();
         } else {
-          // multi_choice: compare index
+          // best_answer: compare index
           selected = parseInt(btn.dataset.index, 10);
           correct = selected === q.answer;
         }
 
         btn.classList.add(correct ? "selected-correct" : "selected-incorrect");
 
-        if (!correct && q.type === "multi_choice") {
+        if (!correct && q.type === "best_answer") {
           document.querySelectorAll(`[data-qid="${q.id}"]`).forEach(b => {
             if (parseInt(b.dataset.index, 10) === q.answer) {
               b.classList.add("reveal-correct");
@@ -874,7 +881,7 @@ function attachEvents(filtered) {
         }
 
         disableOptions(q.id);
-        const correctAnswerText = q.type === "multi_choice" ? q.options[q.answer - 1] : q.answer;
+        const correctAnswerText = q.type === "best_answer" ? q.options[q.answer - 1] : q.answer;
         showFeedback(q.id, correct, correctAnswerText, q.context);
 
         const card = document.getElementById(`card-${q.id}`);
@@ -898,15 +905,15 @@ function attachEvents(filtered) {
 
     saOptions.forEach(btn => {
       btn.addEventListener("click", () => {
-        btn.classList.toggle("selected-correct");
-        const anySelected = [...saOptions].some(b => b.classList.contains("selected-correct"));
+        btn.classList.toggle("selected");
+        const anySelected = [...saOptions].some(b => b.classList.contains("selected"));
         checkBtn.disabled = !anySelected;
       });
     });
 
     checkBtn.addEventListener("click", () => {
       const selected = [...saOptions]
-        .filter(b => b.classList.contains("selected-correct"))
+        .filter(b => b.classList.contains("selected"))
         .map(b => parseInt(b.dataset.index, 10));
 
       const correct = q.answer; // already an array of integers
@@ -915,7 +922,7 @@ function attachEvents(filtered) {
         correct.every(a => selected.includes(a));
 
       saOptions.forEach(btn => {
-        btn.classList.remove("selected-correct");
+        btn.classList.remove("selected");
         const idx = parseInt(btn.dataset.index, 10);
         const wasSelected = selected.includes(idx);
         const isCorrectOption = correct.includes(idx);
