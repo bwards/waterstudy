@@ -75,6 +75,7 @@
     .score-badge .correct-count { color: var(--correct); }
     .score-badge .incorrect-count { color: var(--incorrect); }
     .score-badge .flashcard-count { color: var(--flash); }
+    .score-badge .factsheet-count { color: var(--factsheet); }
 
     /* Filters */
     .filters {
@@ -144,6 +145,7 @@
     .q-card.answered-correct { border-color: var(--correct); }
     .q-card.answered-incorrect { border-color: var(--incorrect); }
     .q-card.answered-flash { border-color: var(--flash); }
+    .q-card[data-type="factsheet"].answered-flash { border-color: #a855f7; }
 
     .q-header {
       display: flex;
@@ -166,6 +168,7 @@
     .badge-best_answer { color: #a78bfa;           border-color: #a78bfa;          background: rgba(167,139,250,0.1); }
     .badge-select_all   { color: var(--correct);   border-color: var(--correct);   background: rgba(61,189,130,0.1); }
     .badge-flashcard    { color: var(--flash);      border-color: var(--flash);     background: rgba(240,160,69,0.1); }
+    .badge-factsheet    { color: #a855f7;          border-color: #a855f7;          background: rgba(168,85,247,0.1); }
 
     .q-id {
       font-size: 0.72rem;
@@ -357,6 +360,14 @@
 
     .reveal-btn:hover { opacity: 0.85; }
 
+    .reveal-btn.factsheet-reveal {
+      background: rgba(168,85,247,0.15);
+      border: 2px solid #a855f7;
+      color: #a855f7;
+    }
+
+    .reveal-btn.factsheet-reveal:hover { opacity: 0.85; }
+
     .flashcard-answer {
       display: none;
       margin-top: 12px;
@@ -371,6 +382,36 @@
     }
 
     .flashcard-answer.show { display: block; }
+
+    /* Factsheet */
+    .factsheet-area {
+      padding: 0 18px 18px;
+    }
+
+    .factsheet-content {
+      display: none;
+      background: rgba(168,85,247,0.08);
+      border: 1px solid #a855f7;
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      color: var(--text);
+      font-size: clamp(0.95rem, 2.2vw, 1.05rem);
+      line-height: 1.6;
+      margin-top: 12px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .factsheet-content.show {
+      display: block;
+    }
+
+    .factsheet-content p {
+      margin: 0 0 12px 0;
+    }
+
+    .factsheet-content p:last-child {
+      margin-bottom: 0;
+    }
 
     /* Note */
     .q-note {
@@ -548,6 +589,7 @@
     <span class="correct-count" id="correctCount">0</span> /
     <span class="incorrect-count" id="incorrectCount">0</span> /
     <span class="flashcard-count" id="flashcardCount">0</span> /
+    <span class="factsheet-count" id="factsheetCount">0</span> /
     Number of Questions: <span id="totalCount">0</span>
   </div>
   <div class="menu-wrap">
@@ -579,6 +621,7 @@
   <button class="filter-btn" data-filter="best_answer">Best Answer</button>
   <button class="filter-btn" data-filter="select_all">Select All</button>
   <button class="filter-btn" data-filter="flashcard">Flashcard</button>
+  <button class="filter-btn" data-filter="factsheet">Factsheet</button>
 </div>
 
 <div class="question-list" id="questionList"></div>
@@ -613,18 +656,19 @@ let session = loadSession(); // { [qid]: { answered, selected, correct, revealed
 let correctCount = 0;
 let incorrectCount = 0;
 let flashcardCount = 0;
+let factsheetCount = 0;
 let answeredCount = 0;
 let currentFilter = "all";
 
 const scoredTypes = ["true_false", "best_answer", "select_all"];
-const flashcardQuestions = questions.filter(q => q.type === "flashcard");
+const flashcardQuestions = questions.filter(q => q.type === "flashcard" || q.type === "factsheet");
 const scorableQuestions = questions.filter(q => scoredTypes.includes(q.type));
 
 // Rehydrate counts from saved session on load
 questions.forEach(q => {
   const s = session[q.id];
   if (!s) return;
-  if (q.type === "flashcard" && s.hasBeenCounted) {
+  if ((q.type === "flashcard" || q.type === "factsheet") && s.hasBeenCounted) {
     flashcardCount++;
   } else if (scoredTypes.includes(q.type) && s.answered) {
     answeredCount++;
@@ -638,7 +682,8 @@ function typeLabel(type) {
     true_false:   "True / False",
     best_answer: "Best Answer",
     select_all:   "Select All",
-    flashcard:    "Flashcard"
+    flashcard:    "Flashcard",
+    factsheet:    "Factsheet"
   }[type] || type;
 }
 
@@ -701,6 +746,20 @@ function renderFlashcard(q) {
   `;
 }
 
+function renderFactsheet(q) {
+  const items = [q.answer, ...q.options];
+  const itemsHtml = items.map(item => `<p>${item}</p>`).join("");
+
+  return `
+    <div class="factsheet-area">
+      <button class="reveal-btn factsheet-reveal" id="reveal-${q.id}">Reveal</button>
+      <div class="factsheet-content" id="fs-blocks-${q.id}">
+        ${itemsHtml}
+      </div>
+    </div>
+  `;
+}
+
 function renderQuestion(q) {
   const tags = q.tags && q.tags.length
     ? `<div class="q-tags">${q.tags.map(t => `<span class="q-tag">${t}</span>`).join("")}</div>`
@@ -715,6 +774,7 @@ function renderQuestion(q) {
   if (q.type === "best_answer") body = renderMultiChoice(q);
   if (q.type === "select_all")   body = renderSelectAll(q);
   if (q.type === "flashcard")    body = renderFlashcard(q);
+  if (q.type === "factsheet")    body = renderFactsheet(q);
 
   const optionsText = q.options.length
     ? q.options.map((o, i) => `${String.fromCharCode(65+i)}. ${o}`).join("\n")
@@ -863,6 +923,16 @@ function restoreCard(q) {
     if (revealBtn) revealBtn.textContent = "Hide Answer";
     if (card) card.classList.add("answered-flash");
   }
+
+  if (q.type === "factsheet" && s.revealed) {
+    const contentDiv = document.getElementById(`fs-blocks-${q.id}`);
+    const revealBtn = document.getElementById(`reveal-${q.id}`);
+    const card = document.getElementById(`card-${q.id}`);
+
+    if (contentDiv) contentDiv.classList.add("show");
+    if (revealBtn) revealBtn.textContent = "Hide All";
+    if (card) card.classList.add("answered-flash");
+  }
 }
 
 function attachEvents(filtered) {
@@ -974,12 +1044,12 @@ function attachEvents(filtered) {
     revealBtn.addEventListener("click", () => {
       const sessionState = session[q.id] || {};
       const hasBeenCounted = sessionState.hasBeenCounted || false;
-      
+
       ansDiv.classList.toggle("show");
       card.classList.toggle("answered-flash");
       const revealed = ansDiv.classList.contains("show");
       revealBtn.textContent = revealed ? "Hide Answer" : "Reveal Answer";
-      
+
       // Only count on FIRST reveal ever (not every toggle)
       if (revealed && !hasBeenCounted) {
         flashcardCount++;
@@ -988,7 +1058,35 @@ function attachEvents(filtered) {
       } else {
         session[q.id] = { ...sessionState, revealed };
       }
-      
+
+      saveSession();
+    });
+  });
+
+  // Factsheet — reveal all content at once
+  filtered.filter(q => q.type === "factsheet").forEach(q => {
+    const revealBtn = document.getElementById(`reveal-${q.id}`);
+    const contentDiv = document.getElementById(`fs-blocks-${q.id}`);
+    const card = document.getElementById(`card-${q.id}`);
+
+    revealBtn.addEventListener("click", () => {
+      const sessionState = session[q.id] || {};
+      const hasBeenCounted = sessionState.hasBeenCounted || false;
+
+      contentDiv.classList.toggle("show");
+      card.classList.toggle("answered-flash");
+      const revealed = contentDiv.classList.contains("show");
+      revealBtn.textContent = revealed ? "Hide All" : "Reveal All";
+
+      // Only count on FIRST reveal ever
+      if (revealed && !hasBeenCounted) {
+        flashcardCount++;
+        updateScore();
+        session[q.id] = { ...sessionState, revealed, hasBeenCounted: true };
+      } else {
+        session[q.id] = { ...sessionState, revealed };
+      }
+
       saveSession();
     });
   });
