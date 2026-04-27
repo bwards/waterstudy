@@ -177,71 +177,7 @@
     .bank-badge.fresh { color: var(--accent); border-color: var(--accent); }
     .bank-badge.in-progress { color: var(--correct); border-color: var(--correct); }
 
-    .bank-stats {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      margin-bottom: 16px;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
 
-    .stat-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .stat-icon {
-      font-size: 1rem;
-      opacity: 0.7;
-    }
-
-    /* Progress bar */
-    .progress-wrap {
-      position: relative;
-      height: 6px;
-      background: var(--bg2);
-      border-radius: 999px;
-      overflow: hidden;
-      margin-bottom: 12px;
-    }
-
-    .progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent-dim), var(--accent));
-      border-radius: 999px;
-      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-    }
-
-    .progress-bar::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      animation: shimmer 2s infinite;
-    }
-
-    @keyframes shimmer {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
-
-    .progress-text {
-      position: relative;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .progress-percentage {
-      font-weight: 600;
-      color: var(--accent);
-    }
 
     .cta-text {
       position: relative;
@@ -320,39 +256,30 @@ const BANKS = [
     file: 'dsa2.html',
     totalQuestions: null, // Will be calculated from localStorage or defaults
   },
+  {
+    id: 'dsb1',
+    title: 'Water Treatment Questions: Dataset B1',
+    file: 'dsb1.html',
+    totalQuestions: null, // Will be calculated from localStorage or defaults
+  },
   // Add more banks here as you create them:
   // { id: 'rr1', title: 'RR1 Advanced Treatment', file: 'rr1.html', totalQuestions: null },
 ];
 
 // ─── Progress Tracking ───────────────────────────────────────────────────────
-function getProgress(bankId) {
+function hasStarted(bankId) {
   try {
     const key = `waterstudy_${bankId}`;
     const raw = localStorage.getItem(key);
-    if (!raw) return { answered: 0, correct: 0, total: 0, percentage: 0 };
+    if (!raw) return false;
     
     const session = JSON.parse(raw);
     const questionIds = Object.keys(session);
     
-    // Count answered questions (exclude flashcards from scoring)
-    let answered = 0;
-    let correct = 0;
-    
-    questionIds.forEach(qid => {
-      const s = session[qid];
-      if (s.answered) {
-        answered++;
-        if (s.correct) correct++;
-      }
-    });
-    
-    // Total is either the number of questions we have in storage, or fallback
-    const total = questionIds.length || 10; // Default estimate if unknown
-    const percentage = total > 0 ? Math.round((answered / total) * 100) : 0;
-    
-    return { answered, correct, total, percentage };
+    // Check if any questions have been answered
+    return questionIds.some(qid => session[qid].answered);
   } catch {
-    return { answered: 0, correct: 0, total: 0, percentage: 0 };
+    return false;
   }
 }
 
@@ -371,41 +298,16 @@ function renderBanks() {
   }
   
   grid.innerHTML = BANKS.map(bank => {
-    const progress = getProgress(bank.id);
-    const hasProgress = progress.answered > 0;
-    const badge = hasProgress ? 'in-progress' : 'fresh';
-    const badgeText = hasProgress ? 'In Progress' : 'Start';
-    const ctaText = hasProgress ? 'Continue' : 'Start';
+    const started = hasStarted(bank.id);
+    const badge = started ? 'in-progress' : 'fresh';
+    const badgeText = started ? 'In Progress' : 'New';
+    const ctaText = started ? 'Continue' : 'Start';
     
     return `
       <a href="${bank.file}" class="bank-card">
         <div class="bank-header">
           <h2 class="bank-title">${bank.title}</h2>
           <span class="bank-badge ${badge}">${badgeText}</span>
-        </div>
-        
-        <div class="bank-stats">
-          <div class="stat-item">
-            <span class="stat-icon">✓</span>
-            <span>${progress.correct} correct</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-icon">✗</span>
-            <span>${progress.answered - progress.correct} incorrect</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-icon">📝</span>
-            <span>${progress.total} total</span>
-          </div>
-        </div>
-        
-        <div class="progress-wrap">
-          <div class="progress-bar" style="width: ${progress.percentage}%"></div>
-        </div>
-        
-        <div class="progress-text">
-          <span>${progress.answered} of ${progress.total} answered</span>
-          <span class="progress-percentage">${progress.percentage}%</span>
         </div>
         
         <div class="cta-text">
