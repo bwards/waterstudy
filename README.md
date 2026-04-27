@@ -1,3 +1,7 @@
+https://bwards.github.io/waterstudy/index.html
+
+---
+
 # 💧 WaterStudy
 
 WaterStudy is a small project I am building while studying for my water treatment operator exams.
@@ -56,3 +60,7 @@ If you want to expand the question bank:
 ## 💬 Contact
 
 If you have any questions or want to discuss any errors with the website, please make a Github issue here.
+
+---
+
+https://bwards.github.io/waterstudy/index.html
