@@ -20,6 +20,7 @@
       --incorrect-bg: #3a1a20;
       --flash:      #f0a045;
       --flash-bg:   #3a2a10;
+      --factsheet:  #a855f7;
       --selected:   #2a4a6a;
       --selected-border: #3d6b9a;
       --radius:     14px;
@@ -668,8 +669,10 @@ const scorableQuestions = questions.filter(q => scoredTypes.includes(q.type));
 questions.forEach(q => {
   const s = session[q.id];
   if (!s) return;
-  if ((q.type === "flashcard" || q.type === "factsheet") && s.hasBeenCounted) {
+  if (q.type === "flashcard" && s.hasBeenCounted) {
     flashcardCount++;
+  } else if (q.type === "factsheet" && s.hasBeenCounted) {
+    factsheetCount++;
   } else if (scoredTypes.includes(q.type) && s.answered) {
     answeredCount++;
     if (s.correct) correctCount++; else incorrectCount++;
@@ -851,9 +854,10 @@ function updateScore() {
   document.getElementById("correctCount").textContent = correctCount;
   document.getElementById("incorrectCount").textContent = incorrectCount;
   document.getElementById("flashcardCount").textContent = flashcardCount;
+  document.getElementById("factsheetCount").textContent = factsheetCount;
   const totalScorable = scorableQuestions.length + flashcardQuestions.length;
   document.getElementById("totalCount").textContent = totalScorable;
-  const totalAnswered = answeredCount + flashcardCount;
+  const totalAnswered = answeredCount + flashcardCount + factsheetCount;
   const pct = totalScorable
     ? (totalAnswered / totalScorable) * 100
     : 0;
@@ -1080,7 +1084,7 @@ function attachEvents(filtered) {
 
       // Only count on FIRST reveal ever
       if (revealed && !hasBeenCounted) {
-        flashcardCount++;
+        factsheetCount++;
         updateScore();
         session[q.id] = { ...sessionState, revealed, hasBeenCounted: true };
       } else {
@@ -1119,6 +1123,7 @@ document.getElementById("confirmReset").addEventListener("click", () => {
   correctCount = 0;
   incorrectCount = 0;
   flashcardCount = 0;
+  factsheetCount = 0;
   answeredCount = 0;
   confirmOverlay.classList.remove("open");
   updateScore();
