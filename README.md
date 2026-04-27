@@ -1,6 +1,7 @@
 # 💧 WaterStudy
 
 WaterStudy is a small project I am building while studying for my water treatment operator exams. My original goal was to make flashcards but I didn't like that most websites I saw were cluttered with advertisements.
+
 This is just a clean website, with no ads. It's still very much a work-in-progress that I may never finish...
 
 * Regulation questions are largely focused on Canadian limits, however most of the questions are from US water theory textbooks, Sacremento/ AWWA.
@@ -9,7 +10,7 @@ This is just a clean website, with no ads. It's still very much a work-in-progre
 
 ## 🚀 Features
 
-* 📚 **Question Bank**
+**Question Bank**
 
   * True / False
   * Best Answer (A–D) - Only one correct answer
