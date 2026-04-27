@@ -1,6 +1,9 @@
 # 💧 WaterStudy
 
-WaterStudy is a focused study website to help prepare for water treatment operator exams.  
+WaterStudy is a small project I am building while studying for my water treatment operator exams. My original goal was to make flashcards but I didn't like that most websites I saw were cluttered with advertisements.
+This is just a clean website, with no ads. It's still very much a work-in-progress that I may never finish...
+
+* Regulation questions are largely focused on Canadian limits, however most of the questions are from US water theory textbooks, Sacremento/ AWWA.
 
 ---
 
@@ -8,17 +11,20 @@ WaterStudy is a focused study website to help prepare for water treatment operat
 
 * 📚 **Question Bank**
 
-  * Multiple choice (A–D)
   * True / False
-  * Scenario-based questions
-  * Commonly tested concepts
+  * Best Answer (A–D) - Only one correct answer
+  * Select All (A–D) - One or all answers maybe correct
+  * Flashcards
+  * Factsheets
 
 ---
 
 ## 🧪 Question Format
 
 Question datasets originate as a Google Sheet (Excel) file organized in a specific way. It's exported as a CSV file, then converted to the JS dataset seen in this Github repo.
+
 When the structure and my plans are more rigid, I'd welcome adding other question bank datasets, they don't necessarily even need to be for water treatment operator..
+
 Example structure used in `dataset.js`:
 
 ```js
@@ -36,20 +42,6 @@ Example structure used in `dataset.js`:
 
 ---
 
-## 🎯 Goals
-
-* Help operators study conveniently from their phone or computer
-* Provide a reusable and expandable study system
-
----
-
-## 🛠️ Future Ideas.. Maybe?
-
-* Difficulty levels (Class I → IV) or categories
-* Questions are shuffled each session or answer choices are shuffled per question?
-
----
-
 ## ⚠️ Disclaimer
 
 This project is intended as a **study aid only**. Always refer to official provincial/ state guidelines for regulation requirements.
@@ -64,13 +56,8 @@ If you want to expand the question bank:
 
 ---
 
-## 📌 Notes
-
-* Regulations are largely focused on Canadian limits
-* This is a work-in-progress (WIP) project as I am studing for my certifications
-
 ## 💬 Contact
 
-If you have any questions or discuss an error with the questions, please make a Github issue.
+If you have any questions or want to discuss any errors with the website, please make a Github issue here.
 
 ---
