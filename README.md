@@ -1,10 +1,13 @@
 # 💧 WaterStudy
 
-WaterStudy is a small project I am building while studying for my water treatment operator exams. My original goal was to make flashcards but I didn't like that most websites I saw were cluttered with advertisements.
+WaterStudy is a small project I am building while studying for my water treatment operator exams.
+
+I wanted to make flashcards, but existing websites for that are cluttered with ads.
 
 This is just a clean website, with no ads. It's still very much a work-in-progress that I may never finish...
 
-* Regulation questions are largely focused on Canadian limits, however most of the questions are from US water theory textbooks, Sacremento/ AWWA.
+* ⚠️ Regulation questions are largely focused on Guidelines for Canadian Drinking Water Quality, however most of the theory/ questions are from US water treatment theory programs, Sacremento/ AWWA.
+* ⚠️ There maybe mistakes, typos. Please report anything that looks ambiguous.
 
 ---
 
@@ -43,13 +46,6 @@ Example structure used in `dataset.js`:
 
 ---
 
-## ⚠️ Disclaimer
-
-This project is intended as a **study aid only**. Always refer to official provincial/ state guidelines for regulation requirements.
-There maybe mistakes, typos. Please report anything that looks ambiguous.
-
----
-
 ## 🤝 Contributing
 
 If you want to expand the question bank:
@@ -60,5 +56,3 @@ If you want to expand the question bank:
 ## 💬 Contact
 
 If you have any questions or want to discuss any errors with the website, please make a Github issue here.
-
----
