@@ -20,8 +20,8 @@ This is just a clean website, with no ads. It's still very much a work-in-progre
 **Question Bank**
 
   * True / False
-  * Best Answer (A–D) - Only one correct answer
-  * Select All (A–D) - One or all answers maybe correct
+  * Best Answer (1-4) - Only one correct answer
+  * Select All (1-5) - One or all answers maybe correct
   * Flashcards
   * Factsheets
 
