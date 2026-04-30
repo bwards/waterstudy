@@ -4,12 +4,13 @@ https://bwards.github.io/waterstudy/index.html
 
 # 💧 WaterStudy
 
-WaterStudy is a small project I am building while studying for my water treatment operator exams.
+WaterStudy is a small project I am building while studying for my water treatment operator exams, I'm compiling questions I find.
 
 This is just a clean website, with no ads. It's still very much a work-in-progress that I may never finish...
 
-* ⚠️ Regulation questions are largely focused on Guidelines for Canadian Drinking Water Quality, the rest is standard water treatment theory.
-* There maybe mistakes, typos. Please report anything that looks ambiguous.
+* ⚠️ Regulation questions are largely focused on Guidelines for Canadian Drinking Water Quality.
+ 
+* If I have typos or mistakes please report by making a Github issue.
 
 ---
 
