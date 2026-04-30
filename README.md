@@ -4,7 +4,9 @@ https://bwards.github.io/waterstudy/index.html
 
 # 💧 WaterStudy
 
-WaterStudy is a small project I am building while studying for my water treatment operator exams, I'm compiling questions I find.
+WaterStudy is a small project I am building while studying for my water treatment operator exams.
+
+I'm compiling these questions as I find them and have time.
 
 This is just a clean website, with no ads. It's still very much a work-in-progress that I may never finish...
 
