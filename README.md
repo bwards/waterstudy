@@ -6,11 +6,9 @@ https://bwards.github.io/waterstudy/index.html
 
 WaterStudy is a small project I am building while studying for my water treatment operator exams.
 
-I wanted to make flashcards, but existing websites for that are cluttered with ads.
-
 This is just a clean website, with no ads. It's still very much a work-in-progress that I may never finish...
 
-* ⚠️ Regulation questions are largely focused on Guidelines for Canadian Drinking Water Quality, however most of the theory/ questions are from US water treatment theory programs, Sacremento/ AWWA.
+* ⚠️ Regulation questions are largely focused on Guidelines for Canadian Drinking Water Quality, however most of the theory/ questions are from US water treatment theory programs, Sacremento/ AWWA/ Google/ etc.
 * ⚠️ There maybe mistakes, typos. Please report anything that looks ambiguous.
 
 ---
