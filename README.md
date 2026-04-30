@@ -8,8 +8,9 @@ WaterStudy is a small project I am building while studying for my water treatmen
 
 This is just a clean website, with no ads. It's still very much a work-in-progress that I may never finish...
 
-* ⚠️ Regulation questions are largely focused on Guidelines for Canadian Drinking Water Quality, however most of the theory/ questions are from US water treatment theory programs, Sacremento/ AWWA/ Google/ etc.
-* ⚠️ There maybe mistakes, typos. Please report anything that looks ambiguous.
+* ⚠️ Regulation questions are largely focused on Guidelines for Canadian Drinking Water Quality
+* Most of the theory questions are from US water treatment programs, Sacremento/ AWWA/ Google/ etc.
+* There maybe mistakes, typos. Please report anything that looks ambiguous.
 
 ---
 
