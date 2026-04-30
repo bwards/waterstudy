@@ -236,7 +236,7 @@
 
 <header>
   <h1>Water Treatment Study</h1>
-  <p class="subtitle">Choose a question bank to begin</p>
+  <p class="subtitle">With no annoying advertisements!</p>
 </header>
 
 <main>
@@ -244,20 +244,29 @@
 </main>
 
 <footer>
-  <p>Track your progress across question banks • <a href="https://github.com/bwards/waterstudy" target="_blank" rel="noopener">View on GitHub</a></p>
+  <p>Various questions I compiled while studying • <a href="https://github.com/bwards/waterstudy" target="_blank" rel="noopener">View on GitHub</a></p>
 </footer>
 
 <script>
 // ─── Question Banks Configuration ────────────────────────────────────────────
 const BANKS = [
   {
+    id: 'dsa1',
+    title: 'Water Treatment I',
+    file: 'dsa1.html'
+  },
+  {
     id: 'dsa2',
-    title: 'Water Treatment Questions: Dataset Sample',
-    file: 'dsa2.html',
-    totalQuestions: null, // Will be calculated from localStorage or defaults
+    title: 'Water Treatment II',
+    file: 'dsa2.html'
+  },
+  {
+    id: 'dsb1',
+    title: 'Guidelines for Canadian Drinking Water Quality',
+    file: 'dsb1.html'
   },
   // Add more banks here as you create them:
-  // { id: 'rr1', title: 'RR1 Advanced Treatment', file: 'rr1.html', totalQuestions: null },
+  // { id: 'rr1', title: 'RR1 Advanced Treatment', file: 'rr1.html'},
 ];
 
 // ─── Progress Tracking ───────────────────────────────────────────────────────
