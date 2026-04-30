@@ -279,8 +279,8 @@ function hasStarted(bankId) {
     const session = JSON.parse(raw);
     const questionIds = Object.keys(session);
     
-    // Check if any questions have been answered
-    return questionIds.some(qid => session[qid].answered);
+    // Check if any questions have been answered (scored questions) or revealed (flashcards/factsheets)
+    return questionIds.some(qid => session[qid].answered || session[qid].hasBeenCounted);
   } catch {
     return false;
   }
