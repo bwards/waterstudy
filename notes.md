@@ -1,20 +1,37 @@
-# Study Notes
+# Disinfection – Chlorine
 
-## Overview
-Start adding your notes here using markdown format.
+## Key Concept
+Chlorine demand must be satisfied before a free residual is present.
 
-## Topics
-- Topic 1
-- Topic 2
-- Topic 3
+## Equation
+$$
+\text{Dose} = \text{Demand} + \text{Residual}
+$$
 
-## Key Findings
+## Operator Insight
+- High organics → higher demand  
+- Cold water → slower reactions  
+- Breakpoint chlorination occurs after demand is met  
 
-### Section A
+---
 
+## True / False
+- Chlorine residual appears before chlorine demand is satisfied.  
+  **Answer:** False  
 
-### Section B
+---
 
+## Multiple Choice
+**What happens if chlorine demand is not fully satisfied?**
 
-## References
+A. A stable residual forms immediately  
+B. Chlorine reacts with organics and no residual is present  
+C. pH rapidly increases  
+D. Disinfection efficiency increases  
 
+**Answer:** B  
+
+---
+
+## Tags
+#disinfection #chlorine #math
