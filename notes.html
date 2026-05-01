@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study Notes Viewer</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -132,6 +135,16 @@
             border-radius: 5px;
             border-left: 4px solid #c62828;
         }
+
+        /* KaTeX math rendering */
+        .katex-display {
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .katex {
+            font-size: 1.1em;
+        }
     </style>
 </head>
 <body>
@@ -153,6 +166,15 @@
                 if (!response.ok) throw new Error('Failed to load notes');
                 const markdown = await response.text();
                 document.getElementById('content').innerHTML = marked.parse(markdown);
+                
+                // Render math expressions with KaTeX
+                renderMathInElement(document.getElementById('content'), {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ]
+                });
+                
                 document.getElementById('lastUpdated').textContent = 
                     'Last updated: ' + new Date().toLocaleTimeString();
             } catch (error) {
